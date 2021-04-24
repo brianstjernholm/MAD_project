@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1051132330980",
+    "project_id": "family-group-7b6dc",
+    "storage_bucket": "family-group-7b6dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051132330980:android:9b4276021d97f4f294fdf1",
+        "android_client_info": {
+          "package_name": "dk.au.mad21spring.appproject.gruppe2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1051132330980-cmot3it9nmg5bqlekvb6s631trg8po9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAE4PMU7DKBnrzqGzIHGHYzeSX_JxSOKFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051132330980-cmot3it9nmg5bqlekvb6s631trg8po9h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
