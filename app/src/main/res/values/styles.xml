@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#D6EDED</item>
+        <item name="colorPrimaryDark">@color/teal_700</item>
+        <item name="colorAccent">#F688AE</item>
+    </style>
+    
+    <style name="MenuTheme" parent="Theme.AppCompat.Light">
+        <item name="android:background">@android:color/white</item>
+    </style>
+</resources>

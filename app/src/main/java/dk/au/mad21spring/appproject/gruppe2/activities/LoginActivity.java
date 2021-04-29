@@ -2,6 +2,7 @@ package dk.au.mad21spring.appproject.gruppe2.activities;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,43 +13,55 @@ import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
 
 import dk.au.mad21spring.appproject.gruppe2.R;
 import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
+import dk.au.mad21spring.appproject.gruppe2.viewmodels.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     Button btnSignIn;
+    private LoginViewModel vm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        auth = FirebaseAuth.getInstance();
+        //auth = FirebaseAuth.getInstance();
+
+        setUpViewModel();
 
         btnSignIn = findViewById(R.id.btnSignin);
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SignIn();
+                signIn();
             }
         });
     }
 
-    private void SignIn() {
-        if (auth.getCurrentUser() != null){
+    private void setUpViewModel() {
+        vm = new ViewModelProvider(this).get(LoginViewModel.class);
+        vm.init(getApplication());
+    }
+
+    private void signIn() {
+        // if(vm.userLoggedIn) -> go to profile
+        // else vm.signIn()
+
+        if (vm.userLoggedIn()){
             goToProfile();
         } else {
-            List<AuthUI.IdpConfig> providers = Arrays.asList(
-                    new AuthUI.IdpConfig.EmailBuilder().build(),
-                    //new AuthUI.IdpConfig.FacebookBuilder().build(),
-                    new AuthUI.IdpConfig.GoogleBuilder().build()
-            );
+            List<AuthUI.IdpConfig> providers = vm.buildExternalProviderList();
+//            List<AuthUI.IdpConfig> providers = Arrays.asList(
+//                    new AuthUI.IdpConfig.EmailBuilder().build(),
+//                    //new AuthUI.IdpConfig.FacebookBuilder().build(),
+//                    new AuthUI.IdpConfig.TwitterBuilder().build(),
+//                    new AuthUI.IdpConfig.GoogleBuilder().build()
+//            );
 
             startActivityForResult(
                     AuthUI.getInstance()
@@ -65,7 +78,8 @@ public class LoginActivity extends AppCompatActivity {
 
         if (requestCode == Constants.REQUEST_LOGIN) {
             if (resultCode == RESULT_OK) {
-                String uid = auth.getCurrentUser().getUid();
+                String uid = vm.getCurrentUserId();
+                //String uid = auth.getCurrentUser().getUid();
                 Toast.makeText(this, "User logged in\n" + uid, Toast.LENGTH_SHORT).show();
 
                 goToProfile();

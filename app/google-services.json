@@ -15,6 +15,14 @@
       "oauth_client": [
         {
           "client_id": "1051132330980-cmot3it9nmg5bqlekvb6s631trg8po9h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dk.au.mad21spring.appproject.gruppe2",
+            "certificate_hash": "1813876c788a69ad565f4f6e02da3500e8ec1be2"
+          }
+        },
+        {
+          "client_id": "1051132330980-cmot3it9nmg5bqlekvb6s631trg8po9h.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
