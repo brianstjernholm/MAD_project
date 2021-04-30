@@ -3,4 +3,7 @@
     <string name="btn_signin">Sign In</string>
     <string name="btnLogOut">Log Out</string>
     <string name="txtView_Title">the Chat App</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="user_item_username">username</string>
 </resources>

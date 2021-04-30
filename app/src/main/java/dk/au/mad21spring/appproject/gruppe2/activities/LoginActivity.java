@@ -25,6 +25,15 @@ public class LoginActivity extends AppCompatActivity {
     Button btnSignIn;
     private LoginViewModel vm;
 
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        if (vm.userLoggedIn()) {
+//            goToProfile();
+//        }
+//    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == Constants.REQUEST_LOGIN) {
             if (resultCode == RESULT_OK) {
                 String uid = vm.getCurrentUserId();
+                vm.registerUserToDb(LoginActivity.this);
                 //String uid = auth.getCurrentUser().getUid();
                 Toast.makeText(this, "User logged in\n" + uid, Toast.LENGTH_SHORT).show();
 

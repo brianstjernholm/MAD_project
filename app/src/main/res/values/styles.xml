@@ -4,6 +4,7 @@
         <item name="colorPrimary">#D6EDED</item>
         <item name="colorPrimaryDark">@color/teal_700</item>
         <item name="colorAccent">#F688AE</item>
+        <item name="windowActionBar">false</item>
     </style>
     
     <style name="MenuTheme" parent="Theme.AppCompat.Light">

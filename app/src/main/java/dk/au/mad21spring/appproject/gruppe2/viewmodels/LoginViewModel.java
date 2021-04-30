@@ -1,5 +1,6 @@
 package dk.au.mad21spring.appproject.gruppe2.viewmodels;
 
+import android.app.Activity;
 import android.app.Application;
 
 import androidx.lifecycle.ViewModel;
@@ -43,5 +44,9 @@ public class LoginViewModel extends ViewModel {
 
     public String getCurrentUserId() {
         return repository.getCurrentUserId();
+    }
+
+    public void registerUserToDb(Activity activity) {
+        repository.registerUserToDb(activity);
     }
 }
