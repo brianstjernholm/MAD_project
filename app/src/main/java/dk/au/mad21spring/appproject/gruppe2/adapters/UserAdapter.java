@@ -1,6 +1,7 @@
 package dk.au.mad21spring.appproject.gruppe2.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import dk.au.mad21spring.appproject.gruppe2.R;
+import dk.au.mad21spring.appproject.gruppe2.activities.MessageActivity;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 
 //Inspired by https://www.youtube.com/watch?v=WsyJlFjJkyE&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=5
@@ -27,8 +29,8 @@ public class UserAdapter extends
 
     String theLastMessage;
 
-    public UserAdapter(Context mcontext, List<User> mUsers, boolean ischat) {
-        this.mContext = mcontext;
+    public UserAdapter(Context mContext, List<User> mUsers, boolean ischat) {
+        this.mContext = mContext;
         this.mUsers = mUsers;
         this.ischat = ischat;
     }
@@ -50,6 +52,15 @@ public class UserAdapter extends
             Glide.with(mContext).load(user.getImageURL()).into(holder.profile_image);
         }
 
+        //Adding functionality for clicking an item in the recyclerview
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, MessageActivity.class);
+                intent.putExtra("userid", user.getId());
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override

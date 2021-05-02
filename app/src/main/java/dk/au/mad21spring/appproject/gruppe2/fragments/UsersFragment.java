@@ -2,6 +2,7 @@ package dk.au.mad21spring.appproject.gruppe2.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -50,21 +51,28 @@ public class UsersFragment extends Fragment {
 
         readUsers();
 
-        vm.getmUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+        return view;
+    }
+
+//    @Override
+//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+//        super.onActivityCreated(savedInstanceState);
+//        vm = new ViewModelProvider(requireActivity()).get(UserFragmentsViewModel.class);
+//
+//        readUsers();
+//    }
+
+    private void readUsers() {
+        vm.getListOfUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
                 userAdapter = new UserAdapter(getContext(), users, false);
                 recyclerView.setAdapter(userAdapter);
             }
         });
-
-        return view;
-    }
-
-    private void readUsers() {
         //mUsers = vm.getmUsers()
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        //FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        //DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
     }
 
     private void setUpViewModel() {

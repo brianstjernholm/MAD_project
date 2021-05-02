@@ -20,7 +20,7 @@ public class UserFragmentsViewModel extends ViewModel {
         }
     }
 
-    public LiveData<List<User>> getmUsers() {
-        return repository.getmUsers();
+    public LiveData<List<User>> getListOfUsers() {
+        return repository.getListOfUsers();
     }
 }

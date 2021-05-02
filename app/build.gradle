@@ -60,8 +60,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
-    //implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-database:19.7.0'
+    implementation 'com.google.firebase:firebase-database'
+    //implementation 'com.google.firebase:firebase-database:19.7.0'
     implementation 'com.google.firebase:firebase-core'
 
     //Auth (https://firebase.google.com/docs/auth/android/firebaseui)
