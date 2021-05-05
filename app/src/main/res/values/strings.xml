@@ -7,4 +7,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="user_item_username">username</string>
     <string name="hint_typeAmessage">Type a message...</string>
+    <string name="btnSendErrorMessage">You cant send an empty message</string>
+    <string name="titleMyChats">My chats</string>
+    <string name="titleUsers">Users</string>
+    <string name="successfulLogin">User logged in</string>
+    <string name="successRegistration">User registered: </string>
 </resources>

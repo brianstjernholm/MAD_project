@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                 String uid = vm.getCurrentUserId();
                 vm.registerUserToDb(LoginActivity.this);
                 //String uid = auth.getCurrentUser().getUid();
-                Toast.makeText(this, "User logged in\n" + uid, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.successfulLogin) +"\n" + uid, Toast.LENGTH_SHORT).show(); //"User logged in"
 
                 goToProfile();
             }

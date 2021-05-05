@@ -46,10 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         setUpViewModel();
 
-        //Setting up toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
+        setupToolbar();
 
         profile_image = findViewById(R.id.profile_image);
         //profile_image.setImageResource(R.mipmap.ic_launcher);
@@ -74,8 +71,8 @@ public class ProfileActivity extends AppCompatActivity {
         //Setting up ViewPageAdapter and adding fragments
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        viewPagerAdapter.addFragment(new ChatsFragment(), "My Chats");
-        viewPagerAdapter.addFragment(new UsersFragment(), "Users");
+        viewPagerAdapter.addFragment(new ChatsFragment(), getResources().getString(R.string.titleMyChats)); //"My Chats"
+        viewPagerAdapter.addFragment(new UsersFragment(), getResources().getString(R.string.titleUsers)); //"Users"
 
         viewPager.setAdapter(viewPagerAdapter);
 
@@ -103,6 +100,13 @@ public class ProfileActivity extends AppCompatActivity {
 //
 //            }
 //        });
+    }
+
+    private void setupToolbar() {
+        //Setting up toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
     }
 
     private void setUpViewModel() {

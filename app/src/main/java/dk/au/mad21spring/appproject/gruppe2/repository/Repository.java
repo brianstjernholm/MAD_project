@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 
 public class Repository {
@@ -45,7 +46,10 @@ public class Repository {
     private MutableLiveData<User> currentUser = new MutableLiveData<>();
     private MutableLiveData<User> user = new MutableLiveData<>();
     private MutableLiveData<List<User>> mUsers = new MutableLiveData<>();
-
+    private MutableLiveData<List<String>> mUserIdsFromChats = new MutableLiveData<>();
+    private MutableLiveData<List<Chat>> mChats = new MutableLiveData<>();
+    private User userForRetrievingImageUrl = new User();
+    private String userImageUrl = "default";
 
 
     //Ctor
@@ -221,5 +225,102 @@ public class Repository {
 
         reference.child("Chats").push().setValue(hashmap);
 
+    }
+
+    public LiveData<List<String>> getListOfUsersIdsFromMyChats() {
+        readUsersFromChats();
+        return mUserIdsFromChats;
+    }
+
+    private void readUsersFromChats() {
+        //Getting all users()receivers/senders from chats
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference chatUsersReference = FirebaseDatabase
+                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference("Chats");
+        chatUsersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ArrayList<String> temp = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
+
+                    if (chat.getSender().equals(firebaseUser.getUid())) {
+                        temp.add(chat.getReceiver());
+                    }
+                    if (chat.getReceiver().equals(firebaseUser.getUid())) {
+                        temp.add(chat.getSender());
+                    }
+                }
+                mUserIdsFromChats.setValue(temp);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void
+
+    public LiveData<List<Chat>> readMessages(String uid) {
+        readMessagesFromDb(uid);
+        return mChats;
+    }
+
+    public void readMessagesFromDb(String uid) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase
+                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference("Chats");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ArrayList<Chat> temp = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
+
+                    assert chat != null;
+                    assert firebaseUser != null;
+                    //Selecting chats between currentuser and selected user(id)
+                    if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(uid) ||
+                    chat.getReceiver().equals(uid) && chat.getSender().equals(firebaseUser.getUid())) {
+                        temp.add(chat);
+                    }
+                }
+                mChats.setValue(temp);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    public String getImageUrl(String userid){
+
+        DatabaseReference reference = FirebaseDatabase
+                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference("Users")
+                .child(userid);
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //userForRetrievingImageUrl = snapshot.getValue(User.class);
+                userImageUrl = snapshot.getValue(User.class).getImageURL();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        //return userForRetrievingImageUrl.getImageURL();
+        return userImageUrl;
     }
 }
