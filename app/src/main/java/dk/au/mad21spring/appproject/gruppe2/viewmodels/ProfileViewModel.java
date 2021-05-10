@@ -13,7 +13,6 @@ import dk.au.mad21spring.appproject.gruppe2.repository.Repository;
 
 public class ProfileViewModel extends ViewModel {
     private Repository repository = null;
-    private String uid;
 
     public void init(Application application) {
         if (repository == null) {
@@ -22,8 +21,6 @@ public class ProfileViewModel extends ViewModel {
     }
 
     public LiveData<User> getCurrentUserFromDb() { return repository.getCurrentUserFromDb(); }
-
-    public FirebaseUser getCurrentUser() { return repository.getCurrentUser(); }
 
     public void signOut(Context context) {
         repository.signOut(context);

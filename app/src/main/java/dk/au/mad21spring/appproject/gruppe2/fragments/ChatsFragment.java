@@ -12,10 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dk.au.mad21spring.appproject.gruppe2.R;
 import dk.au.mad21spring.appproject.gruppe2.adapters.UserAdapter;
+import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ChatFragmentViewModel;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.UserFragmentsViewModel;
@@ -27,9 +29,6 @@ public class ChatsFragment extends Fragment {
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
 
-    private List<User> mUsers;
-    private List<String> userList;
-
     private ChatFragmentViewModel vm;
 
     @Override
@@ -37,13 +36,17 @@ public class ChatsFragment extends Fragment {
                              Bundle savedInstanceState) {
         setUpViewModel();
 
+        //setting up temporary list for initialization of userAdapter
+        List<User> mUsers = new ArrayList<>();
+
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        getUserIdsFromCurrentUsersChats();
+        userAdapter = new UserAdapter(getContext(), mUsers, false);
+        recyclerView.setAdapter(userAdapter);
 
         return view;
     }
@@ -51,23 +54,25 @@ public class ChatsFragment extends Fragment {
     private void setUpViewModel() {
         vm = new ViewModelProvider(this).get(ChatFragmentViewModel.class);
         vm.init(getActivity().getApplication());
-    }
 
-    private void getUserIdsFromCurrentUsersChats() {
-        vm.getListOfUsersIdsFromMyChats().observe(getViewLifecycleOwner(), new Observer<List<String>>() {
+        //Setting up observers
+        //First observer updates recyclerview
+        vm.getSelectedUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
-            public void onChanged(List<String> strings) {
-                readChats();
+            public void onChanged(List<User> chatUsers) {
+                userAdapter.updateData(chatUsers); //sending new data to adapter
+                userAdapter.notifyDataSetChanged(); //updating recyclerview/adapter with the new data
+            }
+        });
+
+        //Second observer watches for changes in list of chats in repo
+        //upon changes the viewmodel is udpated which triggers first observer
+        vm.observeOnChangesInChatList().observe(getViewLifecycleOwner(), new Observer<List<Chat>>() {
+            @Override
+            public void onChanged(List<Chat> chats) {
+                vm.updateUsersFromChatsList();
+                vm.readSelectedUsers();
             }
         });
     }
-
-    private void readChats() {
-
-    }
-
-
-    // det ser ud som om jeg skal initiere userlist fra min fragment men ikke lytte på den.
-    // Herefter skal jeg i stedte lytte på mUsers(af chats tror jeg nok)
-    // Denne funktion skal opdatere en mUsers i repo på baggrund af den userlist der blevet genereret efter mit indledende kald.
 }

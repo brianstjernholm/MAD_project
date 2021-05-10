@@ -16,13 +16,11 @@ import dk.au.mad21spring.appproject.gruppe2.repository.Repository;
 public class LoginViewModel extends ViewModel {
 
     private Repository repository = null;
-    private String uid;
 
     public void init(Application application) {
         if (repository == null) {
             repository = Repository.getInstance(application);
         }
-        //uid = repository.getCurrentUserId();
     }
 
     public boolean userLoggedIn() {
@@ -36,10 +34,6 @@ public class LoginViewModel extends ViewModel {
                 new AuthUI.IdpConfig.TwitterBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build()
         );
-    }
-
-    public FirebaseUser getCurrentUser() {
-        return repository.getCurrentUser();
     }
 
     public String getCurrentUserId() {

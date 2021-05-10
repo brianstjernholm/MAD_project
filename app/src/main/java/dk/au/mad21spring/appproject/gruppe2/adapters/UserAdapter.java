@@ -78,4 +78,8 @@ public class UserAdapter extends
             profile_image = itemView.findViewById(R.id.profile_image);
         }
     }
+
+    public void updateData (List<User> userList) {
+        mUsers = userList;
+    }
 }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dk.au.mad21spring.appproject.gruppe2.R;
+import dk.au.mad21spring.appproject.gruppe2.adapters.ViewPagerAdapter;
 import dk.au.mad21spring.appproject.gruppe2.fragments.ChatsFragment;
 import dk.au.mad21spring.appproject.gruppe2.fragments.UsersFragment;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
@@ -35,8 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     CircleImageView profile_image;
     TextView username;
-    //FirebaseUser firebaseUser;
-    //DatabaseReference reference;
+
     private ProfileViewModel vm;
 
     @Override
@@ -49,9 +49,7 @@ public class ProfileActivity extends AppCompatActivity {
         setupToolbar();
 
         profile_image = findViewById(R.id.profile_image);
-        //profile_image.setImageResource(R.mipmap.ic_launcher);
         username = findViewById(R.id.username);
-        //username.setText(vm.getCurrentUser().getDisplayName());
 
         vm.getCurrentUserFromDb().observe(this, new Observer<User>() {
             @Override
@@ -65,6 +63,10 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        setupTablayout();
+    }
+
+    private void setupTablayout() {
         final TabLayout tabLayout = findViewById(R.id.tab_layout);
         final ViewPager viewPager = findViewById(R.id.view_pager);
 
@@ -77,29 +79,6 @@ public class ProfileActivity extends AppCompatActivity {
         viewPager.setAdapter(viewPagerAdapter);
 
         tabLayout.setupWithViewPager(viewPager);
-
-//        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                User user = dataSnapshot.getValue(User.class);
-//                username.setText(user.getUsername());
-//                if (user.getImageURL().equals("default")){
-//                    profile_image.setImageResource(R.mipmap.ic_launcher);
-//                } else {
-//
-//                    //change this
-//                    Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
     }
 
     private void setupToolbar() {
@@ -126,7 +105,6 @@ public class ProfileActivity extends AppCompatActivity {
 
             case R.id.logout:
                 vm.signOut(this);
-                //FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
                 finish();
                 return true;
@@ -134,55 +112,4 @@ public class ProfileActivity extends AppCompatActivity {
         return false;
     }
 
-//    public void LogOut() {
-//        // [START auth_fui_signout]
-//        AuthUI.getInstance()
-//                .signOut(this)
-//                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        // User is now signed out
-//
-//                    }
-//                });
-//        Intent i = new Intent(this, LoginActivity.class);
-//        startActivity(i);
-//        finish();
-//        // [END auth_fui_signout]
-//    }
-
-    //Setting up PagerAdapter for shifting between fragments
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-
-        private ArrayList<Fragment> fragments;
-        private ArrayList<String> titles;
-
-        ViewPagerAdapter(FragmentManager fm) {
-            super(fm, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-            this.fragments = new ArrayList<>();
-            this.titles = new ArrayList<>();
-        }
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            fragments.add(fragment);
-            titles.add(title);
-        }
-
-        //ctrl + O
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return titles.get(position);
-        }
-    }
 }

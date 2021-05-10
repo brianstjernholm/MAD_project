@@ -21,9 +21,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,7 +34,7 @@ import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 
 public class Repository {
-
+    //SAFETY VERSION BUT
     //Variables
     private ExecutorService executor;                   //service for async processing
     private RequestQueue queue;                         //volley requestqueue
@@ -43,22 +46,45 @@ public class Repository {
     DatabaseReference reference;
     DatabaseReference usersReference;
     //User user;
+    // Lists for accessing and observing data from vm/activities
     private MutableLiveData<User> currentUser = new MutableLiveData<>();
     private MutableLiveData<User> user = new MutableLiveData<>();
     private MutableLiveData<List<User>> mUsers = new MutableLiveData<>();
-    private MutableLiveData<List<String>> mUserIdsFromChats = new MutableLiveData<>();
+    private List<String> chatUserList;
     private MutableLiveData<List<Chat>> mChats = new MutableLiveData<>();
     private User userForRetrievingImageUrl = new User();
+    private MutableLiveData<List<User>> chatUsers;
     private String userImageUrl = "default";
 
 
-    //Ctor
+    //general purpose lists
+    private MutableLiveData<List<User>> userList;
+    private MutableLiveData<List<Chat>> chatList;
+
+    //list for chatfragment
+    private MutableLiveData<List<User>> usersFromChats;
+
+    //CTOR
     public Repository(Application app) {
         executor = Executors.newSingleThreadExecutor();
         context = app.getApplicationContext();
         auth = FirebaseAuth.getInstance();
+        chatUserList = new ArrayList<>();
         //readUsersFromDb();
+        chatUsers = new MutableLiveData<>();
+
+        //Get current user
+        //firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        userList = new MutableLiveData<>();
+        chatList = new MutableLiveData<>();
+
+        usersFromChats = new MutableLiveData<>();
+
+        readUsers();
+        readChats();
     }
+
 
     public static Repository getInstance(Application application) {
         if (instance == null) {
@@ -67,6 +93,121 @@ public class Repository {
         return instance;
     }
 
+    //reading user from db to userList and setting up observer
+    private void readUsers() {
+        usersReference = FirebaseDatabase
+                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference("Users");
+
+        usersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //mUsers.setValue(null);
+                ArrayList<User> temp = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User user = snapshot.getValue(User.class);
+
+                    assert user != null;
+                    temp.add(user);
+
+//                    assert firebaseUser != null;
+//                    if (!user.getId().equals(firebaseUser.getUid())) {
+//                        temp.add(user);
+//                    }
+                }
+                userList.postValue(temp);
+                //findUsersFromChats();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    //reading chats from db to chatList and setting up observer
+    private void readChats() {
+        usersReference = FirebaseDatabase
+                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference("Chats");
+
+        usersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //mUsers.setValue(null);
+                ArrayList<Chat> temp = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
+                    assert chat != null;
+                    temp.add(chat);
+                }
+                chatList.postValue(temp);
+                //findUsersFromChats();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    //getters/methods for observing on livedata lists for activites/vm
+    public LiveData<List<User>> getSelectedUsers() {
+        return usersFromChats;
+    }
+
+    public LiveData<List<Chat>> getChats() {
+        return chatList;
+    }
+
+    //Methods for initializing and updating chatlist in chatfragment
+    public void updateUsersFromChatsList() {
+        findUsersFromChats();
+    }
+
+    public void findUsersFromChats() {
+        if (chatList!=null) {
+            List<String> userIdList = getUserIdList();
+            List<User> temp = new ArrayList<>();
+            List<User> ul = usersFromChats.getValue();
+
+            //for every user and very id in list:
+            for (User user : userList.getValue()) {
+                for (String id : userIdList) {
+                    //if there is a match
+                    if (user.getId().equals(id)) {
+                        //Check if list is empty
+                        if (temp.size()!=0) {
+                            if (!temp.contains(user.getId())){
+                                temp.add(user);
+                            }
+                        } else {
+                            temp.add(user);
+                        }
+
+                    }
+                }
+            }
+            usersFromChats.postValue(temp);
+        }
+    }
+
+    private List<String> getUserIdList(){
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        List<String> userIdList = new ArrayList<>();
+        List<Chat> cl = chatList.getValue();
+        for (Chat chat : cl) {
+            if (chat.getSender().equals(firebaseUser.getUid()) && !userIdList.contains(chat.getReceiver())) {
+                userIdList.add(chat.getReceiver());
+            }
+            if (chat.getReceiver().equals(firebaseUser.getUid()) && !userIdList.contains(chat.getReceiver())) {
+                userIdList.add(chat.getSender());
+            }
+        }
+        return userIdList;
+    }
 
 
     ////////// Auth related ////////////
@@ -75,12 +216,14 @@ public class Repository {
     public void signOut(Context context) { AuthUI.getInstance().signOut(context); }
 
     public String getCurrentUserId() {
-        return auth.getCurrentUser().getUid();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        return firebaseUser.getUid();
+        //return auth.getCurrentUser().getUid();
     }
 
-    public FirebaseUser getCurrentUser() {
-        return FirebaseAuth.getInstance().getCurrentUser();
-    }
+//    public FirebaseUser getCurrentUser() {
+//        return FirebaseAuth.getInstance().getCurrentUser();
+//    }
 
 
 
@@ -168,7 +311,7 @@ public class Repository {
     }
 
 
-    ////////// RecyclerView related ////////////
+    ////////// Code for user fragment (RecyclerView) ////////////
     private void readUsersFromDb() {
         //Getting current user (logged in user)
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -204,7 +347,7 @@ public class Repository {
         return  mUsers;
     }
 
-    ////////// Message related //////////
+    ////////// Code for sending messages //////////
     public void sendMessage(String receiver, String message) {
         //Getting sender/current user
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -227,33 +370,50 @@ public class Repository {
 
     }
 
-    public LiveData<List<String>> getListOfUsersIdsFromMyChats() {
-        readUsersFromChats();
-        return mUserIdsFromChats;
+    //////////// Code for building chat fragment ////////////
+    public LiveData<List<User>> readUsersFromCurrentUserChats(){
+        readUserIdsFromChats(); // gets the Ids from current users chats (to/from) and sets chatUserList
+        //readChatUsers(); // find users from ids and sets chatUsers
+        return chatUsers;
     }
 
-    private void readUsersFromChats() {
-        //Getting all users()receivers/senders from chats
+    private void readChatUsers() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference chatUsersReference = FirebaseDatabase
                 .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference("Chats");
+                .getReference("Users");
         chatUsersReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<String> temp = new ArrayList<>();
+                List<User> temp = new ArrayList<>();
+                if (chatUsers.getValue()!=null) {
+                    temp = chatUsers.getValue();
+                }
+
+                //Iterator<User> iter = temp.iterator();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Chat chat = snapshot.getValue(Chat.class);
+                    //chatUsers.getValue().clear();
+                    User user = snapshot.getValue(User.class);
 
-                    if (chat.getSender().equals(firebaseUser.getUid())) {
-                        temp.add(chat.getReceiver());
-                    }
-                    if (chat.getReceiver().equals(firebaseUser.getUid())) {
-                        temp.add(chat.getSender());
+                    //Find users with whom current user have correspondence
+                    for (String id : chatUserList) {
+                        if (user.getId().equals(id)) {
+                            //Check if list is empty
+                            if (temp.size() != 0) {
+                                //Check if user already exists in list
+                                for (User user1 : temp) {
+                                    if (!user.getId().equals(user1.getId())) {
+                                        temp.add(user);
+                                    }
+                                }
+                            } else {
+                                temp.add(user);
+                            }
+                        }
                     }
                 }
-                mUserIdsFromChats.setValue(temp);
+                chatUsers.setValue(temp);
             }
 
             @Override
@@ -263,8 +423,40 @@ public class Repository {
         });
     }
 
-    public void
 
+
+    private void readUserIdsFromChats() {
+        //Getting all users()receivers/senders from current users chats
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference chatUsersReference = FirebaseDatabase
+                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference("Chats");
+        chatUsersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                chatUserList.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
+
+                    if (chat.getSender().equals(firebaseUser.getUid())) {
+                        chatUserList.add(chat.getReceiver());
+                    }
+                    if (chat.getReceiver().equals(firebaseUser.getUid())) {
+                        chatUserList.add(chat.getSender());
+                    }
+                }
+                readChatUsers();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    ////////////// Code for reading messages /////////////////////
     public LiveData<List<Chat>> readMessages(String uid) {
         readMessagesFromDb(uid);
         return mChats;
@@ -286,7 +478,7 @@ public class Repository {
                     assert firebaseUser != null;
                     //Selecting chats between currentuser and selected user(id)
                     if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(uid) ||
-                    chat.getReceiver().equals(uid) && chat.getSender().equals(firebaseUser.getUid())) {
+                            chat.getReceiver().equals(uid) && chat.getSender().equals(firebaseUser.getUid())) {
                         temp.add(chat);
                     }
                 }

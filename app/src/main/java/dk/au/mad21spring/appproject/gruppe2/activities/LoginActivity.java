@@ -21,25 +21,13 @@ import dk.au.mad21spring.appproject.gruppe2.viewmodels.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
-    FirebaseAuth auth;
     Button btnSignIn;
     private LoginViewModel vm;
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//
-//        if (vm.userLoggedIn()) {
-//            goToProfile();
-//        }
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        //auth = FirebaseAuth.getInstance();
 
         setUpViewModel();
 
@@ -58,19 +46,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        // if(vm.userLoggedIn) -> go to profile
-        // else vm.signIn()
-
+        //If user is already logged in go directly to profile
+        // otherwise build list of external providers and and start login activity
         if (vm.userLoggedIn()){
             goToProfile();
         } else {
             List<AuthUI.IdpConfig> providers = vm.buildExternalProviderList();
-//            List<AuthUI.IdpConfig> providers = Arrays.asList(
-//                    new AuthUI.IdpConfig.EmailBuilder().build(),
-//                    //new AuthUI.IdpConfig.FacebookBuilder().build(),
-//                    new AuthUI.IdpConfig.TwitterBuilder().build(),
-//                    new AuthUI.IdpConfig.GoogleBuilder().build()
-//            );
 
             startActivityForResult(
                     AuthUI.getInstance()
@@ -84,12 +65,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        // when returning from login activity: check result, register user and go to profile view
         if (requestCode == Constants.REQUEST_LOGIN) {
             if (resultCode == RESULT_OK) {
                 String uid = vm.getCurrentUserId();
                 vm.registerUserToDb(LoginActivity.this);
-                //String uid = auth.getCurrentUser().getUid();
+
                 Toast.makeText(this, getResources().getString(R.string.successfulLogin) +"\n" + uid, Toast.LENGTH_SHORT).show(); //"User logged in"
 
                 goToProfile();
