@@ -153,6 +153,7 @@ public class Repository {
 
     //reading chats from db to chatList and setting up observer
     private void readChats() {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         chatsReference = FirebaseDatabase
                 .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
                 .getReference("Chats");
@@ -161,15 +162,23 @@ public class Repository {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<Chat> tempList = new ArrayList<>();
-                //Chat chatTemp = new Chat();
+//                String chatTemp = new String();
+                Chat tempChat = new Chat();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Chat chat = snapshot.getValue(Chat.class);
                     assert chat != null;
                     tempList.add(chat);
-                    //chatTemp = chat;
+                    tempChat = chat;
+//                    chatTemp = chat.getReceiver();
                 }
                 chatList.postValue(tempList);
-                //latestChat.postValue(chatTemp);
+
+//                if (chatTemp.equals(uid))
+//                latestChatSenderUid.postValue(chatTemp);
+
+                if (tempChat.getReceiver().equals(uid)){
+                    latestChatSenderUid.postValue(tempChat.getSender());
+                }
             }
 
             @Override
@@ -345,9 +354,9 @@ public class Repository {
         //reference.child("Chats").push().setValue(hashmap);
         chatsReference.push().setValue(hashmap);
 
-        if (receiver.equals(firebaseUser.getUid())) {
-            latestChatSenderUid.postValue(sender);
-        }
+//        if (receiver.equals(firebaseUser.getUid())) {
+//            latestChatSenderUid.postValue(sender);
+//        }
 
     }
 
