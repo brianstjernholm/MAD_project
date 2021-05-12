@@ -39,13 +39,11 @@ public class MessageActivity extends AppCompatActivity {
     Context context;
 
     MessageAdapter messageAdapter;
-    List<Chat> mChat;
 
     RecyclerView recyclerView;
     private MessageViewModel vm;
 
     Intent intent;
-    String userImageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,38 +52,25 @@ public class MessageActivity extends AppCompatActivity {
         context = this;
 
         setupViewModel();
-
         setupToolbar();
-
         setupUI();
-
         setupRecyclerView();
 
         intent = getIntent();
         String userid = intent.getStringExtra("userid");
 
-        userImageUrl = vm.getImageUrl(userid);
+        //Getting selected user from db and setting up view
+        User user = vm.getUserFromDb(userid);
 
-        //Setting up ui and listening for changes
-        vm.getUserFromDb(userid).observe(this, new Observer<User>() {
-            @Override
-            public void onChanged(User user) {
-                username.setText(user.getUsername());
-                if (user.getImageURL().equals("default")) {
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
-                } else {
-                    Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
-                }
-                readMessages(userid);
+        username.setText(user.getUsername());
+        if (user.getImageURL().equals("default")) {
+            profile_image.setImageResource(R.mipmap.ic_launcher);
+        } else {
+            Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
+        }
 
-                //messageAdapter = new MessageAdapter(MessageActivity.this, mChat, userImageUrl); //vm.getImageUrl(userid)
-                //recyclerView.setAdapter(messageAdapter);
-            }
-        });
-
-//        readMessages(userid);
-//        messageAdapter = new MessageAdapter(MessageActivity.this, mChat, userImageUrl); //vm.getImageUrl(userid)
-//        recyclerView.setAdapter(messageAdapter);
+        //getting chats to/from user and setting up observer
+        readMessages(userid);
 
         //Setting up send button (send message)
         btn_send.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +80,6 @@ public class MessageActivity extends AppCompatActivity {
                 if (!msg.equals("")) {
                     sendMessage(userid, msg);
                 } else {
-                    //Toast.makeText(MessageActivity.this, "You can't send an empty message", Toast.LENGTH_SHORT).show();
                     makeToast_sendMessageError();
                 }
                 text_send.setText("");
@@ -145,18 +129,14 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void readMessages(final String userid) {
-        mChat = new ArrayList<>();
         vm.readMessages(userid).observe(this, new Observer<List<Chat>>() {
             @Override
             public void onChanged(List<Chat> chats) {
-                mChat = chats;
-                messageAdapter = new MessageAdapter(MessageActivity.this, chats, userImageUrl); //vm.getImageUrl(userid)
+                messageAdapter = new MessageAdapter(MessageActivity.this, chats, vm.getImageUrl(userid)); //vm.getImageUrl(userid) //userImageUrl
                 recyclerView.setAdapter(messageAdapter);
                 messageAdapter.notifyDataSetChanged();
             }
         });
-        //messageAdapter = new MessageAdapter(MessageActivity.this, mChat, userImageUrl); //vm.getImageUrl(userid)
-        //recyclerView.setAdapter(messageAdapter);
     }
 
     private void makeToast_sendMessageError() {

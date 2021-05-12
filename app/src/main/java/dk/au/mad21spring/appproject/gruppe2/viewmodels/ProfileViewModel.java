@@ -20,7 +20,9 @@ public class ProfileViewModel extends ViewModel {
         }
     }
 
-    public LiveData<User> getCurrentUserFromDb() { return repository.getCurrentUserFromDb(); }
+    public User getCurrentUserFromDb() {
+        return repository.getCurrentUserFromDb();
+    }
 
     public void signOut(Context context) {
         repository.signOut(context);

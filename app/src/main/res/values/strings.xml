@@ -12,4 +12,11 @@
     <string name="titleUsers">Users</string>
     <string name="successfulLogin">User logged in</string>
     <string name="successRegistration">User registered: </string>
+    <string name="successfullRegistration">Successful registration</string>
+    <string name="notificationservice">The Chat App Notification Service</string>
+    <string name="thisisnotification">This is The Chat App Notification Service</string>
+
+    thisisnotification
+
+    notificationservice
 </resources>

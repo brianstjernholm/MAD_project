@@ -27,23 +27,34 @@ public class ChatFragmentViewModel extends ViewModel {
         readSelectedUsers();
     }
 
-    public LiveData<List<Chat>> observeOnChangesInChatList() {
-        return repository.getChats();
-    }
-
-    public void updateUsersFromChatsList() {
-        repository.updateUsersFromChatsList();
-    }
-
-    public LiveData<List<User>> getSelectedUsers() {
-        return selectedUsers;
-    }
-
+    //initialize the list of users without current user in repo
     private void initUsersFromChatList() {
         repository.findUsersFromChats();
     }
 
+    //read data from repo to local selectedUserList
+    //This triggers the observer in the fragment
     public void readSelectedUsers() {
         selectedUsers = repository.getSelectedUsers();
+    }
+
+    //Observes on the list of all chats in repo and notifies fragment when a new chat is added
+    public LiveData<List<Chat>> observeOnChangesInChatList() {
+        return repository.getChats();
+    }
+
+    //updates the list of selected users in repo when a new chat is registered
+    public void updateUsersFromChatsList() {
+        repository.updateUsersFromChatsList();
+    }
+
+    //Observes on the list of selected users in repo and notifies fragment when the list is updated
+    public LiveData<List<User>> getSelectedUsers() {
+        return selectedUsers;
+    }
+
+    //notificationservice!!!
+    public LiveData<String> observeOnLatestChat() {
+        return repository.observeOnLatestChat();
     }
 }

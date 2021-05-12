@@ -29,6 +29,7 @@ import dk.au.mad21spring.appproject.gruppe2.adapters.ViewPagerAdapter;
 import dk.au.mad21spring.appproject.gruppe2.fragments.ChatsFragment;
 import dk.au.mad21spring.appproject.gruppe2.fragments.UsersFragment;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
+import dk.au.mad21spring.appproject.gruppe2.services.NotificationsService;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ProfileViewModel;
 
 //This activity is inspired by this video tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
@@ -45,25 +46,27 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         setUpViewModel();
-
+        //startService();
         setupToolbar();
 
         profile_image = findViewById(R.id.profile_image);
         username = findViewById(R.id.username);
 
-        vm.getCurrentUserFromDb().observe(this, new Observer<User>() {
-            @Override
-            public void onChanged(User user) {
-                username.setText(user.getUsername());
-                if (user.getImageURL().equals("default")) {
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
-                } else {
-                    Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
-                }
-            }
-        });
+        //get current user info from db and set view
+        User user = vm.getCurrentUserFromDb();
+        username.setText(user.getUsername());
+        if (user.getImageURL().equals("default")) {
+            profile_image.setImageResource(R.mipmap.ic_launcher);
+        } else {
+            Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
+        }
 
         setupTablayout();
+    }
+
+    private void startService() {
+        Intent notificationServiceIntent = new Intent(this, NotificationsService.class);
+        startService(notificationServiceIntent);
     }
 
     private void setupTablayout() {

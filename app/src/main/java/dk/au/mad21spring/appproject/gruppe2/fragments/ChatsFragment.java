@@ -1,5 +1,7 @@
 package dk.au.mad21spring.appproject.gruppe2.fragments;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,18 +18,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.au.mad21spring.appproject.gruppe2.R;
+import dk.au.mad21spring.appproject.gruppe2.adapters.ChatAdapter;
 import dk.au.mad21spring.appproject.gruppe2.adapters.UserAdapter;
 import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
+import dk.au.mad21spring.appproject.gruppe2.services.NotificationsService;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ChatFragmentViewModel;
-import dk.au.mad21spring.appproject.gruppe2.viewmodels.UserFragmentsViewModel;
 
 
 public class ChatsFragment extends Fragment {
 
     //UI
     private RecyclerView recyclerView;
-    private UserAdapter userAdapter;
+    private ChatAdapter chatAdapter;
 
     private ChatFragmentViewModel vm;
 
@@ -45,8 +48,8 @@ public class ChatsFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        userAdapter = new UserAdapter(getContext(), mUsers, false);
-        recyclerView.setAdapter(userAdapter);
+        chatAdapter = new ChatAdapter(getContext(), mUsers, false);
+        recyclerView.setAdapter(chatAdapter);
 
         return view;
     }
@@ -60,8 +63,8 @@ public class ChatsFragment extends Fragment {
         vm.getSelectedUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> chatUsers) {
-                userAdapter.updateData(chatUsers); //sending new data to adapter
-                userAdapter.notifyDataSetChanged(); //updating recyclerview/adapter with the new data
+                chatAdapter.updateData(chatUsers); //sending new data to adapter
+                chatAdapter.notifyDataSetChanged(); //updating recyclerview/adapter with the new data
             }
         });
 
@@ -74,5 +77,18 @@ public class ChatsFragment extends Fragment {
                 vm.readSelectedUsers();
             }
         });
+
+        //notificationService!!!!
+        vm.observeOnLatestChat().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String senderUid) {
+                startService(senderUid);
+            }
+        });
+    }
+    private void startService(String uid) {
+        Intent newChatNotificationIntent = new Intent(getContext(), NotificationsService.class);
+        newChatNotificationIntent.putExtra("ThisShouldBeAConstant", uid);
+        getActivity().startService(newChatNotificationIntent);
     }
 }

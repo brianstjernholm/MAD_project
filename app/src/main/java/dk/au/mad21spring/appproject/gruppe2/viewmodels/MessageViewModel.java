@@ -14,7 +14,6 @@ import dk.au.mad21spring.appproject.gruppe2.repository.Repository;
 
 public class MessageViewModel extends ViewModel {
     private Repository repository = null;
-    private String uid;
 
     public void init(Application application) {
         if (repository == null) {
@@ -22,11 +21,7 @@ public class MessageViewModel extends ViewModel {
         }
     }
 
-    public LiveData<User> getUserFromDb(String uid) { return repository.getUserFromDb(uid); }
-
-    public void signOut(Context context) {
-        repository.signOut(context);
-    }
+    public User getUserFromDb(String uid) { return repository.getUserFromDb(uid); }
 
     public void sendMessage(String receiver, String message) {
         repository.sendMessage(receiver, message);

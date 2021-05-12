@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.au.mad21spring.appproject.gruppe2.R;
+import dk.au.mad21spring.appproject.gruppe2.adapters.ChatAdapter;
 import dk.au.mad21spring.appproject.gruppe2.adapters.UserAdapter;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ProfileViewModel;
@@ -33,12 +34,13 @@ public class UsersFragment extends Fragment {
     private RecyclerView recyclerView;
 
     private UserAdapter userAdapter;
-    //private List<User> mUsers;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setUpViewModel();
+
+        List<User> mUsers = new ArrayList<>();
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_users, container, false);
@@ -47,36 +49,32 @@ public class UsersFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        //mUsers = new ArrayList<>();
 
-        readUsers();
+        userAdapter = new UserAdapter(getContext(), mUsers, false);
+        recyclerView.setAdapter(userAdapter);
 
         return view;
     }
 
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        vm = new ViewModelProvider(requireActivity()).get(UserFragmentsViewModel.class);
-//
-//        readUsers();
-//    }
-
-    private void readUsers() {
-        vm.getListOfUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
-            @Override
-            public void onChanged(List<User> users) {
-                userAdapter = new UserAdapter(getContext(), users, false);
-                recyclerView.setAdapter(userAdapter);
-            }
-        });
-        //mUsers = vm.getmUsers()
-        //FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        //DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-    }
 
     private void setUpViewModel() {
         vm = new ViewModelProvider(this).get(UserFragmentsViewModel.class);
         vm.init(getActivity().getApplication());
+
+        vm.getListOfUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                vm.update();
+                vm.readList();
+            }
+        });
+
+        vm.getSelectedUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                userAdapter.updateData(users);
+                userAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }
