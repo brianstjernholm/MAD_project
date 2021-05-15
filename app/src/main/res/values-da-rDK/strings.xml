@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">The Chat App</string>
+    <string name="btn_signin">Log ind</string>
+    <string name="btnLogOut">Log ud</string>
+    <string name="txtView_Title">Besked App</string>
+    <string name="hello_blank_fragment">Hej tom fragtment</string>
+    <string name="user_item_username">Brugernavn</string>
+    <string name="hint_typeAmessage">Skriv en besked...</string>
+    <string name="btnSendErrorMessage">Du kan ikke sende en tom besked</string>
+    <string name="titleMyChats">Mine beskeder</string>
+    <string name="titleUsers">Brugere</string>
+    <string name="successfulLogin">Bruger logget ind</string>
+    <string name="successRegistration">Bruger er registreret: </string>
+    <string name="successfullRegistration">Korrekt registrering</string>
+    <string name="notificationservice">Notifikation service for besked appen</string>
+    <string name="thisisnotification">Dette er besked appen med notifikation service</string>
+    <string name="startingNotificationService">Foreground service kører</string>
+</resources>

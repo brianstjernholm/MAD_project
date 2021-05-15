@@ -18,6 +18,7 @@ import java.util.List;
 import dk.au.mad21spring.appproject.gruppe2.R;
 import dk.au.mad21spring.appproject.gruppe2.activities.MessageActivity;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
+import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 
 //Inspired by https://www.youtube.com/watch?v=WsyJlFjJkyE&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=5
 public class ChatAdapter extends
@@ -56,7 +57,7 @@ public class ChatAdapter extends
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("userid", user.getId());
+                intent.putExtra(Constants.USER_ID, user.getId());
                 mContext.startActivity(intent);
             }
         });

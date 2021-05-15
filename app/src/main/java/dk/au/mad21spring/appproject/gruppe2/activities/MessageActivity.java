@@ -27,6 +27,7 @@ import dk.au.mad21spring.appproject.gruppe2.R;
 import dk.au.mad21spring.appproject.gruppe2.adapters.MessageAdapter;
 import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
+import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.MessageViewModel;
 
 public class MessageActivity extends AppCompatActivity {
@@ -57,7 +58,7 @@ public class MessageActivity extends AppCompatActivity {
         setupRecyclerView();
 
         intent = getIntent();
-        String userid = intent.getStringExtra("userid");
+        String userid = intent.getStringExtra(Constants.USER_ID);
 
         //Getting selected user from db and setting up view
         User user = vm.getUserFromDb(userid);

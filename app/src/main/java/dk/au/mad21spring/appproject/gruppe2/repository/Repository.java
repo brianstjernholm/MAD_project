@@ -38,6 +38,7 @@ import java.util.concurrent.Executors;
 import dk.au.mad21spring.appproject.gruppe2.R;
 import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.ChuckNorris;
+import dk.au.mad21spring.appproject.gruppe2.models.ChuckParser;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 
@@ -71,6 +72,7 @@ public class Repository {
 
     //notification service
     private MutableLiveData<String> latestChatSenderUid;
+    private MutableLiveData<ChuckNorris> newChuck;
 
     //CTOR
     public Repository(Application app) {
@@ -86,6 +88,7 @@ public class Repository {
         listWithoutCurrentUser = new MutableLiveData<>();
         usersFromChats = new MutableLiveData<>();
         latestChatSenderUid = new MutableLiveData<>();
+        newChuck = new MutableLiveData<>();
 
         readUsers();
         readChats();
@@ -153,7 +156,13 @@ public class Repository {
 
     //reading chats from db to chatList and setting up observer
     private void readChats() {
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid;
+        if (FirebaseAuth.getInstance().getCurrentUser()!=null) {
+            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }else{
+            uid = "default";
+        }
+
         chatsReference = FirebaseDatabase
                 .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
                 .getReference("Chats");
@@ -177,7 +186,7 @@ public class Repository {
 //                latestChatSenderUid.postValue(chatTemp);
 
                 if (tempChat.getReceiver().equals(uid)){
-                    latestChatSenderUid.postValue(tempChat.getSender());
+                    latestChatSenderUid.setValue(tempChat.getSender());
                 }
             }
 
@@ -235,17 +244,6 @@ public class Repository {
         String uid = firebaseUser.getUid();
         List<String> userIdList = new ArrayList<>();
         List<Chat> cl = chatList.getValue();
-
-//        Iterator<Chat> clIterator = cl.iterator();
-//        while (clIterator.hasNext()) {
-//            if (clIterator.next().getSender().equals(uid) && !userIdList.contains(clIterator.next().getReceiver())) {
-//                userIdList.add(clIterator.next().getReceiver());
-//            }
-//            if (clIterator.next().getReceiver().equals(uid) && !userIdList.contains(clIterator.next().getSender())) {
-//                userIdList.add(clIterator.next().getSender());
-//            }
-//            clIterator.next();
-//        }
 
         for (Chat chat : cl) {
             if (chat.getSender()!=null && chat.getSender().equals(uid) && !userIdList.contains(chat.getReceiver())) {
@@ -341,9 +339,9 @@ public class Repository {
             sender = firebaseUser.getUid();
         }
 
-        DatabaseReference reference = FirebaseDatabase
-                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference();
+//        DatabaseReference reference = FirebaseDatabase
+//                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
+//                .getReference();
 
         //Building message
         HashMap<String, String> hashmap = new HashMap<>();
@@ -362,13 +360,13 @@ public class Repository {
 
 
     ////////////// Code for reading messages /////////////////////
-    //TODO: needs updating
+    //TODO: needs updating (se below, but remove call to readMessagesFromDb())
     public LiveData<List<Chat>> readMessages(String uid) {
         readMessagesFromDb(uid);
         return mChats;
     }
 
-    //TODO: needs updating
+    //TODO: needs updating (call method to update mchats from chatList eventlistener instead)
     public void readMessagesFromDb(String uid) {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase
@@ -400,7 +398,7 @@ public class Repository {
 
     }
 
-    //TODO: needs updating
+    //TODO: needs updating (find the url in the list of users instead)
     public String getImageUrl(String userid){
 
         DatabaseReference reference = FirebaseDatabase
@@ -424,7 +422,13 @@ public class Repository {
         return userImageUrl;
     }
 
+
     //Get API data
+    public LiveData<ChuckNorris> observeOnChuck() {
+        return newChuck;
+    }
+
+
     public void getChuck() {
         String dataUrl = "https://api.chucknorris.io/jokes/random";
         sendApiRequest(dataUrl);
@@ -458,12 +462,25 @@ public class Repository {
 
     private void parseJson(String json) {
         Gson gson = new GsonBuilder().create();
-        ChuckNorris chuck = gson.fromJson(json, ChuckNorris.class);
+        ChuckParser temporaryChuck = gson.fromJson(json, ChuckParser.class);
 
-        if (chuck.getValue()==null){
-            Toast.makeText(context, "Chuck wasn't found", Toast.LENGTH_SHORT).show();
-        }else{
-
+        if (temporaryChuck!=null) {
+            ChuckNorris chuck = new ChuckNorris(
+                    temporaryChuck.getCreatedAt(),
+                    temporaryChuck.getIconUrl(),
+                    temporaryChuck.getId(),
+                    temporaryChuck.getUpdatedAt(),
+                    temporaryChuck.getUrl(),
+                    temporaryChuck.getValue()
+            );
+            newChuck.postValue(chuck);
         }
+
+
+//        if (chuck.getValue()==null){
+//            Toast.makeText(context, "Chuck wasn't found", Toast.LENGTH_SHORT).show();
+//        }else{
+//
+//        }
     }
 }

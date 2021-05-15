@@ -46,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         setUpViewModel();
-        //startService();
+        startService();
         setupToolbar();
 
         profile_image = findViewById(R.id.profile_image);

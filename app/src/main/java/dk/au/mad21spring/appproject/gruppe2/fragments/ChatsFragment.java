@@ -79,16 +79,16 @@ public class ChatsFragment extends Fragment {
         });
 
         //notificationService!!!!
-        vm.observeOnLatestChat().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String senderUid) {
-                startService(senderUid);
-            }
-        });
+//        vm.observeOnLatestChat().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(String senderUid) {
+//                startService(senderUid);
+//            }
+//        });
     }
-    private void startService(String uid) {
-        Intent newChatNotificationIntent = new Intent(getContext(), NotificationsService.class);
-        newChatNotificationIntent.putExtra("ThisShouldBeAConstant", uid);
-        getActivity().startService(newChatNotificationIntent);
-    }
+//    private void startService(String uid) {
+//        Intent newChatNotificationIntent = new Intent(getContext(), NotificationsService.class);
+//        newChatNotificationIntent.putExtra("ThisShouldBeAConstant", uid);
+//        getActivity().startService(newChatNotificationIntent);
+//    }
 }

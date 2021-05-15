@@ -57,4 +57,6 @@ public class ChatFragmentViewModel extends ViewModel {
     public LiveData<String> observeOnLatestChat() {
         return repository.observeOnLatestChat();
     }
+
+
 }

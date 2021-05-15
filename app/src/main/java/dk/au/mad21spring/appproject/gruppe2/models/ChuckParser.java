@@ -1,30 +1,42 @@
 package dk.au.mad21spring.appproject.gruppe2.models;
 
-public class ChuckNorris {
-    private String category;
+
+import java.util.List;
+import javax.annotation.Generated;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+@Generated("jsonschema2pojo")
+public class ChuckParser {
+
+    @SerializedName("categories")
+    @Expose
+    private List<Object> categories = null;
+    @SerializedName("created_at")
+    @Expose
     private String createdAt;
+    @SerializedName("icon_url")
+    @Expose
     private String iconUrl;
+    @SerializedName("id")
+    @Expose
     private String id;
+    @SerializedName("updated_at")
+    @Expose
     private String updatedAt;
+    @SerializedName("url")
+    @Expose
     private String url;
+    @SerializedName("value")
+    @Expose
     private String value;
 
-    public ChuckNorris(String createdAt, String iconUrl, String id, String updatedAt, String url, String value) {
-        this.category = null;
-        this.createdAt = createdAt;
-        this.iconUrl = iconUrl;
-        this.id = id;
-        this.updatedAt = updatedAt;
-        this.url = url;
-        this.value = value;
+    public List<Object> getCategories() {
+        return categories;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategories(List<Object> categories) {
+        this.categories = categories;
     }
 
     public String getCreatedAt() {

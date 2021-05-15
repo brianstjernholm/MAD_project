@@ -6,6 +6,8 @@ public class Constants {
     public static final int MSG_TYPE_LEFT = 0;
     public static final int MSG_TYPE_RIGHT = 1;
 
+    public static final String USER_ID = "userid";
+
     public static final String SERVICE = "NotificationService";
     public static final String SERVICE_CHANNEL = "serviceChannel";
     public static final String UPDATE_CHANNEL = "updateChannel";
