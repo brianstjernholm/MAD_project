@@ -32,9 +32,10 @@ import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.services.NotificationsService;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ProfileViewModel;
 
-//This activity is inspired by this video tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
+//Adapted from https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 public class ProfileActivity extends AppCompatActivity {
 
+    //UI widgets
     CircleImageView profile_image;
     TextView username;
 
@@ -45,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        //Setting up activity
         setUpViewModel();
         startService();
         setupToolbar();
@@ -65,6 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void startService() {
+        //Initializing notification service
         Intent notificationServiceIntent = new Intent(this, NotificationsService.class);
         startService(notificationServiceIntent);
     }
@@ -76,8 +79,8 @@ public class ProfileActivity extends AppCompatActivity {
         //Setting up ViewPageAdapter and adding fragments
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        viewPagerAdapter.addFragment(new ChatsFragment(), getResources().getString(R.string.titleMyChats)); //"My Chats"
-        viewPagerAdapter.addFragment(new UsersFragment(), getResources().getString(R.string.titleUsers)); //"Users"
+        viewPagerAdapter.addFragment(new ChatsFragment(), getResources().getString(R.string.titleMyChats));
+        viewPagerAdapter.addFragment(new UsersFragment(), getResources().getString(R.string.titleUsers));
 
         viewPager.setAdapter(viewPagerAdapter);
 
@@ -101,6 +104,7 @@ public class ProfileActivity extends AppCompatActivity {
         return true;
     }
 
+    //Signout method
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {

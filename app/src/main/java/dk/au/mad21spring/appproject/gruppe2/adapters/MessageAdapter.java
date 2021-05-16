@@ -33,12 +33,6 @@ public class MessageAdapter extends
     private List<Chat> mChat;
     private String imageurl;
 
-    private boolean ischat;
-
-    private ChatFragmentViewModel vm;
-
-    String theLastMessage;
-
     public MessageAdapter(Context mContext, List<Chat> mChat, String imageurl) {
         this.mContext = mContext;
         this.mChat = mChat;
@@ -60,7 +54,7 @@ public class MessageAdapter extends
     }
 
     @Override
-    //Setting up list items
+    //Setting up UI
     public void onBindViewHolder(@NonNull MessageAdapter.ViewHolder holder, int position) {
         Chat chat = mChat.get(position);
 

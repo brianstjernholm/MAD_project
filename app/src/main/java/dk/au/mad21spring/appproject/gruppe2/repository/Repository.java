@@ -379,6 +379,7 @@ public class Repository {
         hashmap.put("message", message);
 
         chatsReference.push().setValue(hashmap);
+        Log.d(Constants.MESSAGE_TAG, "message send to receiver");
     }
 
 

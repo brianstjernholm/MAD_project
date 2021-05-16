@@ -19,20 +19,16 @@ import dk.au.mad21spring.appproject.gruppe2.R;
 import dk.au.mad21spring.appproject.gruppe2.activities.MessageActivity;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
+//Adapted from https://www.youtube.com/watch?v=WsyJlFjJkyE&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=5
 
-//Inspired by https://www.youtube.com/watch?v=WsyJlFjJkyE&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=5
 public class ChatAdapter extends
         RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private Context mContext;
     private List<User> mUsers;
-    private boolean ischat;
 
-    String theLastMessage;
-
-    public ChatAdapter(Context mContext, List<User> mUsers, boolean ischat) {
+    public ChatAdapter(Context mContext, List<User> mUsers) {
         this.mContext = mContext;
         this.mUsers = mUsers;
-        this.ischat = ischat;
     }
 
     @NonNull

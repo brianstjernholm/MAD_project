@@ -27,8 +27,9 @@ import dk.au.mad21spring.appproject.gruppe2.adapters.UserAdapter;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ProfileViewModel;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.UserFragmentsViewModel;
-//This code is an adaptation of this tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
+//Adapted from https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
+//Handles displaying list of all app users
 public class UsersFragment extends Fragment {
 
     private UserFragmentsViewModel vm;
@@ -47,12 +48,11 @@ public class UsersFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_users, container, false);
 
+        //Setting up recyclerview
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
-        userAdapter = new UserAdapter(getContext(), mUsers, false);
+        userAdapter = new UserAdapter(getContext(), mUsers);
         recyclerView.setAdapter(userAdapter);
 
         return view;

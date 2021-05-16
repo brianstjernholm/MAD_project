@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -27,7 +28,7 @@ import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.MessageViewModel;
-//This activity is inspired by this video tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
+//Adapted from https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -39,10 +40,9 @@ public class MessageActivity extends AppCompatActivity {
     Context context;
 
     MessageAdapter messageAdapter;
-
     RecyclerView recyclerView;
-    private MessageViewModel vm;
 
+    private MessageViewModel vm;
     Intent intent;
 
     String userId;
@@ -58,15 +58,16 @@ public class MessageActivity extends AppCompatActivity {
         setupUI();
         setupRecyclerView();
 
+        //Getting user id from intent
         intent = getIntent();
-        String userid = intent.getStringExtra(Constants.USER_ID);
-
         userId = intent.getStringExtra(Constants.USER_ID);
 
-        //Getting selected user from db and setting up view
-        User user = vm.getUserFromDb(userid);
+        //Getting user to chat with from repo / Needed to init recyclerview/adapter
+        User user = vm.getUserFromDb(userId);
 
+        //Getting user info for UI
         username.setText(user.getUsername());
+
         if (user.getImageURL().equals("default")) {
             profile_image.setImageResource(R.mipmap.ic_launcher);
         } else {
@@ -74,7 +75,7 @@ public class MessageActivity extends AppCompatActivity {
         }
 
         //getting chats to/from user and setting up observer
-        readMessages(userid);
+        readMessages(userId);
         observeOnChatList();
 
         //Setting up send button (send message)
@@ -83,7 +84,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String msg = text_send.getText().toString();
                 if (!msg.equals("")) {
-                    sendMessage(userid, msg);
+                    sendMessage(userId, msg);
                 } else {
                     makeToast_sendMessageError();
                 }
@@ -135,6 +136,7 @@ public class MessageActivity extends AppCompatActivity {
 
     // Method for updating recyclerview upon changes to my chats
     private void readMessages(final String userid) {
+        Log.d(Constants.MESSAGE_TAG,"Starting to observe on mChat in repository");
         vm.readMessages(userid).observe(this, new Observer<List<Chat>>() {
             @Override
             public void onChanged(List<Chat> chats) {
@@ -147,6 +149,7 @@ public class MessageActivity extends AppCompatActivity {
 
     // Method for observing on changes in chat list / new chat -> update list of my chats
     private void observeOnChatList() {
+        Log.d(Constants.MESSAGE_TAG,"Starting to observe on chatList in repository");
         vm.observeOnChatList().observe(this, new Observer<List<Chat>>() {
             @Override
             public void onChanged(List<Chat> chats) {
@@ -158,4 +161,5 @@ public class MessageActivity extends AppCompatActivity {
     private void makeToast_sendMessageError() {
         Toast.makeText(this, getResources().getString(R.string.btnSendErrorMessage), Toast.LENGTH_SHORT).show();
     }
+
 }

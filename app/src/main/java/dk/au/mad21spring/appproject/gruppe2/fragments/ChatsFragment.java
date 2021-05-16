@@ -24,10 +24,10 @@ import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.services.NotificationsService;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ChatFragmentViewModel;
-//This code is an adaptation of this tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
+//Adapted from https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
+//Handles displaying all user with whom logged in/current user have a chat
 public class ChatsFragment extends Fragment {
-
     //UI
     private RecyclerView recyclerView;
     private ChatAdapter chatAdapter;
@@ -44,11 +44,11 @@ public class ChatsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
+        //Setting up recyclerview
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        chatAdapter = new ChatAdapter(getContext(), mUsers, false);
+        chatAdapter = new ChatAdapter(getContext(), mUsers);
         recyclerView.setAdapter(chatAdapter);
 
         return view;

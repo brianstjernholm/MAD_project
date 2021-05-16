@@ -20,7 +20,9 @@ import dk.au.mad21spring.appproject.gruppe2.viewmodels.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
+    //UI Widgets
     Button btnSignIn;
+
     private LoginViewModel vm;
 
     @Override
@@ -51,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
             goToProfile();
         } else {
             List<AuthUI.IdpConfig> providers = vm.buildExternalProviderList();
-
+            // go to external auth
             startActivityForResult(
                     AuthUI.getInstance()
                             .createSignInIntentBuilder()
@@ -64,13 +66,13 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // when returning from login activity: check result, register user and go to profile view
+        // when returning from external auth: check result, register user and go to profile view
         if (requestCode == Constants.REQUEST_LOGIN) {
             if (resultCode == RESULT_OK) {
                 String uid = vm.getCurrentUserId();
                 vm.registerUserToDb(LoginActivity.this);
 
-                Toast.makeText(this, getResources().getString(R.string.successfulLogin) +"\n" + uid, Toast.LENGTH_SHORT).show(); //"User logged in"
+                Toast.makeText(this, getResources().getString(R.string.successfulLogin) +"\n" + uid, Toast.LENGTH_SHORT).show();
 
                 goToProfile();
             }

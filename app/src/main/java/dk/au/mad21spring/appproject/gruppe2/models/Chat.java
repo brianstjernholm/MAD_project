@@ -13,8 +13,10 @@ public class Chat {
         this.message = message;
     }
 
+    //default ctor
     public Chat() { }
 
+    //Getter + setters
     public String getSender() { return sender; }
 
     public void setSender(String sender) { this.sender = sender; }

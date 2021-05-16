@@ -11,7 +11,7 @@ public class User {
         this.imageURL = imageURL;
     }
 
-    //firebase need default constructor
+    //Default ctor
     public User() { }
 
     //getters+setters
