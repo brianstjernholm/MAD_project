@@ -24,7 +24,7 @@ import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.services.NotificationsService;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ChatFragmentViewModel;
-
+//This code is an adaptation of this tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
 public class ChatsFragment extends Fragment {
 
@@ -77,18 +77,6 @@ public class ChatsFragment extends Fragment {
                 vm.readSelectedUsers();
             }
         });
-
-        //notificationService!!!!
-//        vm.observeOnLatestChat().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(String senderUid) {
-//                startService(senderUid);
-//            }
-//        });
     }
-//    private void startService(String uid) {
-//        Intent newChatNotificationIntent = new Intent(getContext(), NotificationsService.class);
-//        newChatNotificationIntent.putExtra("ThisShouldBeAConstant", uid);
-//        getActivity().startService(newChatNotificationIntent);
-//    }
+
 }

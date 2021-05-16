@@ -10,6 +10,7 @@ import java.util.List;
 import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.repository.Repository;
+//This activity is inspired by this video tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
 public class ChatFragmentViewModel extends ViewModel {
 
@@ -52,11 +53,4 @@ public class ChatFragmentViewModel extends ViewModel {
     public LiveData<List<User>> getSelectedUsers() {
         return selectedUsers;
     }
-
-    //notificationservice!!!
-    public LiveData<String> observeOnLatestChat() {
-        return repository.observeOnLatestChat();
-    }
-
-
 }

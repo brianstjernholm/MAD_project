@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        //If user is already logged in go directly to profile
+        // If user is already logged in go directly to profile
         // otherwise build list of external providers and and start login activity
         if (vm.userLoggedIn()){
             goToProfile();

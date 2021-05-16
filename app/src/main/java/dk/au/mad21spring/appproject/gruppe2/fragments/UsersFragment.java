@@ -27,6 +27,7 @@ import dk.au.mad21spring.appproject.gruppe2.adapters.UserAdapter;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ProfileViewModel;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.UserFragmentsViewModel;
+//This code is an adaptation of this tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
 public class UsersFragment extends Fragment {
 
@@ -40,6 +41,7 @@ public class UsersFragment extends Fragment {
                              Bundle savedInstanceState) {
         setUpViewModel();
 
+        // temporary list for loading recyclerview
         List<User> mUsers = new ArrayList<>();
 
         // Inflate the layout for this fragment
@@ -61,6 +63,9 @@ public class UsersFragment extends Fragment {
         vm = new ViewModelProvider(this).get(UserFragmentsViewModel.class);
         vm.init(getActivity().getApplication());
 
+        //Observe on list of users
+        // -> if new user then update vm and check if relevant
+        // -> update list of users with whom current user has chat
         vm.getListOfUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
@@ -69,6 +74,7 @@ public class UsersFragment extends Fragment {
             }
         });
 
+        //Observes on changes to list of users with whom current user has chat and updates recyclerview
         vm.getSelectedUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {

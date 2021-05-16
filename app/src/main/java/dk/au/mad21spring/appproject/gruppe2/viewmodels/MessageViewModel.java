@@ -32,7 +32,15 @@ public class MessageViewModel extends ViewModel {
     }
 
     public String getImageUrl(String userid) {
-        return repository.getImageUrl(userid);
+        return repository.getImageURL(userid);
+    }
+
+    public LiveData<List<Chat>> observeOnChatList() {
+        return repository.getChats();
+    }
+
+    public void updateMyMessages(String uid) {
+        repository.updateMyMessages(uid);
     }
 
 }

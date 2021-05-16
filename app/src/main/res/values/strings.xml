@@ -15,4 +15,5 @@
     <string name="notificationservice">The Chat App Notification Service</string>
     <string name="thisisnotification">This is The Chat App Notification Service</string>
     <string name="startingNotificationService">Foreground service up and running</string>
+    <string name="nojoke">Sorry. No joke could be found.</string>
 </resources>

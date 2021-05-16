@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -19,7 +18,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -29,6 +27,7 @@ import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.MessageViewModel;
+//This activity is inspired by this video tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -46,6 +45,8 @@ public class MessageActivity extends AppCompatActivity {
 
     Intent intent;
 
+    String userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +61,8 @@ public class MessageActivity extends AppCompatActivity {
         intent = getIntent();
         String userid = intent.getStringExtra(Constants.USER_ID);
 
+        userId = intent.getStringExtra(Constants.USER_ID);
+
         //Getting selected user from db and setting up view
         User user = vm.getUserFromDb(userid);
 
@@ -72,6 +75,7 @@ public class MessageActivity extends AppCompatActivity {
 
         //getting chats to/from user and setting up observer
         readMessages(userid);
+        observeOnChatList();
 
         //Setting up send button (send message)
         btn_send.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +133,7 @@ public class MessageActivity extends AppCompatActivity {
         vm.sendMessage(receiver, message);
     }
 
+    // Method for updating recyclerview upon changes to my chats
     private void readMessages(final String userid) {
         vm.readMessages(userid).observe(this, new Observer<List<Chat>>() {
             @Override
@@ -136,6 +141,16 @@ public class MessageActivity extends AppCompatActivity {
                 messageAdapter = new MessageAdapter(MessageActivity.this, chats, vm.getImageUrl(userid)); //vm.getImageUrl(userid) //userImageUrl
                 recyclerView.setAdapter(messageAdapter);
                 messageAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    // Method for observing on changes in chat list / new chat -> update list of my chats
+    private void observeOnChatList() {
+        vm.observeOnChatList().observe(this, new Observer<List<Chat>>() {
+            @Override
+            public void onChanged(List<Chat> chats) {
+                vm.updateMyMessages(userId);
             }
         });
     }

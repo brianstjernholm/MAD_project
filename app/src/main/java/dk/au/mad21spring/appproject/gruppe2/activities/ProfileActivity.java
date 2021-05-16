@@ -85,7 +85,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setupToolbar() {
-        //Setting up toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");

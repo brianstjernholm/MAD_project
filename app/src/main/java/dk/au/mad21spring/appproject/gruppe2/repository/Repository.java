@@ -3,6 +3,7 @@ package dk.au.mad21spring.appproject.gruppe2.repository;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Region;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -43,7 +44,6 @@ import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 
 public class Repository {
-    //UPDATED VERSION
     //Variables
     private ExecutorService executor;                   //service for async processing
     private RequestQueue queue;                         //volley requestqueue
@@ -57,7 +57,6 @@ public class Repository {
     DatabaseReference usersReference;
 
     // Lists for accessing and observing data from vm/activities
-    private MutableLiveData<List<Chat>> mChats = new MutableLiveData<>();
     private String userImageUrl = "default";
 
     //general purpose lists
@@ -70,9 +69,13 @@ public class Repository {
     //list for userfragment
     private MutableLiveData<List<User>> listWithoutCurrentUser;
 
+    //list for MessageAcitivty
+    private MutableLiveData<List<Chat>> mChats = new MutableLiveData<>();
+
     //notification service
     private MutableLiveData<String> latestChatSenderUid;
     private MutableLiveData<ChuckNorris> newChuck;
+
 
     //CTOR
     public Repository(Application app) {
@@ -102,6 +105,7 @@ public class Repository {
         return instance;
     }
 
+    // GETTING LIST OF ALL USERS FROM DB
     //reading user from db to userList and setting up observer
     private void readUsers() {
         usersReference = FirebaseDatabase
@@ -126,34 +130,13 @@ public class Repository {
         });
     }
 
+    //Method fro observing on changes in list of all users (will update with new entry in db)
     public LiveData<List<User>> getUsers() {
         return userList;
     }
 
-    public void initUserListWithoutCurrentUser() {
-        List<User> temp = new ArrayList<>();
 
-        if (userList!=null) {
-            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-            for (User user : userList.getValue()) {
-                if (!user.getId().equals(uid)) {
-                    temp.add(user);
-                }
-            }
-        }
-        listWithoutCurrentUser.postValue(temp);
-    }
-
-    public void updateUserListWithoutCurrentUser() {
-        initUserListWithoutCurrentUser();
-    }
-
-
-    public LiveData<List<User>> getUserListWithoutCurrentUser() {
-        return listWithoutCurrentUser;
-    }
-
+    // GETTING LIST OF ALL CHATS FROM DB
     //reading chats from db to chatList and setting up observer
     private void readChats() {
         String uid;
@@ -188,6 +171,7 @@ public class Repository {
                 if (tempChat.getReceiver().equals(uid)){
                     latestChatSenderUid.setValue(tempChat.getSender());
                 }
+
             }
 
             @Override
@@ -195,21 +179,89 @@ public class Repository {
         });
     }
 
-    //getters/methods for activites/vm for observing on livedata lists
-    public LiveData<List<User>> getSelectedUsers() {
-        return usersFromChats;
-    }
 
+    // Method for chatfragment and MessageActivity to observe on changes in list of all chats (will update with new entry in db)
     public LiveData<List<Chat>> getChats() {
         return chatList;
     }
 
-    //notificationservice
+
+    // Method for notificationservice and chatfragment to observe on id of last user to send chat
     public LiveData<String> observeOnLatestChat(){
         return latestChatSenderUid;
     }
 
-    //Methods for initializing and updating chatlist in chatfragment
+
+    //Register user to db (upon successful registration)
+    // TODO check if user is owerwriten or if we need to make db
+    public void registerUserToDb(Activity activity) {
+        //Getting current user (logged in user)
+        FirebaseUser firebaseUser = auth.getCurrentUser();
+        assert firebaseUser != null;
+        //Evt log.d
+        String userid = firebaseUser.getUid();
+
+        //Get specific reference to database
+        DatabaseReference reference = usersReference.child(userid);
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("id", userid);
+        hashMap.put("username", firebaseUser.getDisplayName());
+        hashMap.put("imageURL", "default");
+        hashMap.put("status", "offline");
+        hashMap.put("search", firebaseUser.getDisplayName());
+
+        reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(activity, activity.getResources().getString(R.string.successfullRegistration), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+
+    //region Methods for initializing and updating list of all users without current user (for userfragment)
+
+    //Method fro initializing list of all users without current user
+    public void initUserListWithoutCurrentUser() {
+        List<User> temp = new ArrayList<>();
+
+        if (userList!=null) {
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+            for (User user : userList.getValue()) {
+                if (!user.getId().equals(uid)) {
+                    temp.add(user);
+                }
+            }
+        }
+        listWithoutCurrentUser.postValue(temp);
+    }
+    // Method for userfragment to observe on list of all users without current user
+    public LiveData<List<User>> getUserListWithoutCurrentUser() {
+        return listWithoutCurrentUser;
+    }
+
+    // Method for udating list of all users without current user
+    public void updateUserListWithoutCurrentUser() {
+        initUserListWithoutCurrentUser();
+    }
+
+    //endregion
+
+
+
+    //region Methods for handling list of user with whom current user have chatted (usersFromChat)
+
+    // Method for chatfragment to listen on changes in list of user with whom I've chatted with
+    public LiveData<List<User>> getSelectedUsers() {
+        return usersFromChats;
+    }
+
+    //Methods for initializing and updating list og users with whom I've chatted with
     public void updateUsersFromChatsList() {
         findUsersFromChats();
     }
@@ -257,7 +309,11 @@ public class Repository {
         return userIdList;
     }
 
+    //endregion
 
+
+
+    //region Auth related Methods
 
     ////////// Auth/Login related ////////////
     public boolean userLoggedIn() { return auth.getCurrentUser() != null; }
@@ -269,8 +325,11 @@ public class Repository {
         return firebaseUser.getUid();
     }
 
+    //endregion
 
 
+
+    //region Methods for getting users from list of users
     ////////// Db related ////////////
     //Get current user from db and setup listener
     public User getCurrentUserFromDb() { //LiveData<User>
@@ -299,37 +358,11 @@ public class Repository {
         return tempUser;
     }
 
-
-    //Register user to db upon successful registration
-    // TODO check if user is owerwriten or if we need to make db
-    public void registerUserToDb(Activity activity) {
-        //Getting current user (logged in user)
-        FirebaseUser firebaseUser = auth.getCurrentUser();
-        assert firebaseUser != null;
-        //Evt log.d
-        String userid = firebaseUser.getUid();
-
-        //Get specific reference to database
-        DatabaseReference reference = usersReference.child(userid);
-
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("id", userid);
-        hashMap.put("username", firebaseUser.getDisplayName());
-        hashMap.put("imageURL", "default");
-        hashMap.put("status", "offline");
-        hashMap.put("search", firebaseUser.getDisplayName());
-
-        reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(activity, activity.getResources().getString(R.string.successfullRegistration), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
+    //endregion
 
 
+
+    //region Messaging methods
     ////////// Code for sending messages //////////
     public void sendMessage(String receiver, String message) {
         //Getting sender/current user
@@ -339,101 +372,54 @@ public class Repository {
             sender = firebaseUser.getUid();
         }
 
-//        DatabaseReference reference = FirebaseDatabase
-//                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
-//                .getReference();
-
         //Building message
         HashMap<String, String> hashmap = new HashMap<>();
         hashmap.put("sender", sender);
         hashmap.put("receiver", receiver);
         hashmap.put("message", message);
 
-        //reference.child("Chats").push().setValue(hashmap);
         chatsReference.push().setValue(hashmap);
-
-//        if (receiver.equals(firebaseUser.getUid())) {
-//            latestChatSenderUid.postValue(sender);
-//        }
-
     }
 
 
     ////////////// Code for reading messages /////////////////////
-    //TODO: needs updating (se below, but remove call to readMessagesFromDb())
     public LiveData<List<Chat>> readMessages(String uid) {
-        readMessagesFromDb(uid);
         return mChats;
     }
 
-    //TODO: needs updating (call method to update mchats from chatList eventlistener instead)
-    public void readMessagesFromDb(String uid) {
+    public void updateMyMessages(String uid) {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase
-                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference("Chats");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<Chat> temp = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Chat chat = snapshot.getValue(Chat.class);
 
-                    assert chat != null;
-                    assert firebaseUser != null;
-                    //Selecting chats between currentuser and selected user(id)
-                    if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(uid) ||
-                            chat.getReceiver().equals(uid) && chat.getSender().equals(firebaseUser.getUid())) {
-                        temp.add(chat);
-                    }
-                }
-                mChats.setValue(temp);
+        List<Chat> tempChat = new ArrayList<>();
+
+        for (Chat chat : chatList.getValue()) {
+            if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(uid) ||
+                    chat.getReceiver().equals(uid) && chat.getSender().equals(firebaseUser.getUid())) {
+                tempChat.add(chat);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+        }
+        mChats.setValue(tempChat);
     }
 
-    //TODO: needs updating (find the url in the list of users instead)
-    public String getImageUrl(String userid){
-
-        DatabaseReference reference = FirebaseDatabase
-                .getInstance("https://family-group-7b6dc-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference("Users")
-                .child(userid);
-
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //userForRetrievingImageUrl = snapshot.getValue(User.class);
-                userImageUrl = snapshot.getValue(User.class).getImageURL();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        //return userForRetrievingImageUrl.getImageURL();
-        return userImageUrl;
-    }
+    //endregion
 
 
-    //Get API data
+
+    //region API methods
+
+    //API RELATED
+    //Observer for notificationservice
     public LiveData<ChuckNorris> observeOnChuck() {
         return newChuck;
     }
 
-
+    //Get a chuck joke
     public void getChuck() {
         String dataUrl = "https://api.chucknorris.io/jokes/random";
         sendApiRequest(dataUrl);
     }
 
+    //Send API request using volley
     private void sendApiRequest(String dataUrl) {
         executor.execute(new Runnable() {
             @Override
@@ -452,7 +438,7 @@ public class Repository {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(Constants.API_TAG, "No Chuck", error);
-                        Toast.makeText(context, "Sorry. No joke could be found.", Toast.LENGTH_SHORT).show();
+                        errormessage_noJoke();
                     }
                 });
                 queue.add(request);
@@ -460,6 +446,7 @@ public class Repository {
         });
     }
 
+    //Parse the API json response to own class
     private void parseJson(String json) {
         Gson gson = new GsonBuilder().create();
         ChuckParser temporaryChuck = gson.fromJson(json, ChuckParser.class);
@@ -475,12 +462,21 @@ public class Repository {
             );
             newChuck.postValue(chuck);
         }
+    }
+
+    //endregion
 
 
-//        if (chuck.getValue()==null){
-//            Toast.makeText(context, "Chuck wasn't found", Toast.LENGTH_SHORT).show();
-//        }else{
-//
-//        }
+    public String getImageURL(String userid) {
+        for (User user : userList.getValue()) {
+            if (user.getId().equals(userid)) {
+                return user.getImageURL();
+            }
+        }
+        return "Default";
+    }
+
+    private void errormessage_noJoke() {
+        Toast.makeText(context, context.getResources().getString(R.string.nojoke), Toast.LENGTH_SHORT).show();
     }
 }

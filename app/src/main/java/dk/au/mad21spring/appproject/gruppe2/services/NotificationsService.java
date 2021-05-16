@@ -26,6 +26,7 @@ import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 
 //This service is modelled from lecture 05
 //https://blackboard.au.dk/webapps/blackboard/content/listContent.jsp?course_id=_145093_1&content_id=_2949310_1&mode=reset
+
 public class NotificationsService extends LifecycleService {
     //Variables
     private ExecutorService execService;    //ExecutorService for running things off the main thread
@@ -45,20 +46,11 @@ public class NotificationsService extends LifecycleService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //build notificationchannel
-//        if(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            NotificationChannel channel = new NotificationChannel(Constants.SERVICE_CHANNEL, getResources().getString(R.string.notificationservice), NotificationManager.IMPORTANCE_LOW);
-//            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//            notificationManager.createNotificationChannel(channel);
-//        }
 
         super.onStartCommand(intent, flags, startId);
 
         buildNotificationChannel(Constants.SERVICE_CHANNEL, Constants.SERVICE_TAG);
         buildNotificationChannel(Constants.UPDATE_CHANNEL, Constants.UPDATE_TAG);
-
-//        Bundle bundle = intent.getExtras();
-//        String uid = bundle.getString("ThisShouldBeAConstant");
 
         uid = new String();
 
@@ -67,14 +59,6 @@ public class NotificationsService extends LifecycleService {
                 .setContentTitle(getResources().getString(R.string.startingNotificationService))
                 .setSmallIcon(R.mipmap.app_logo_round)
                 .build();
-
-//        //Build the notification
-//        Notification notification = new NotificationCompat.Builder(this, Constants.SERVICE_CHANNEL)
-//                .setContentTitle(getResources().getString(R.string.notificationservice))
-//                //.setContentText(getResources().getString(R.string.thisisnotification))
-//                .setSmallIcon(R.mipmap.app_logo_round)
-//                //.setTicker(getResources().getString(R.string.eachcity))
-//                .build();
 
         //Call to startForeground will promote this Service to a Notification service (manifest permission added)
         //Also require the notification to be set, so that user can always see that Service is running in the background
@@ -104,10 +88,6 @@ public class NotificationsService extends LifecycleService {
 
     //Initatializing service in the background
     private void doBackgroundWork(ChuckNorris chuckNorris, String uid) {
-//        if(!started) {
-//
-//            started = true;
-//        }
         doActualWork(chuckNorris, uid);
     }
 
@@ -118,8 +98,6 @@ public class NotificationsService extends LifecycleService {
             execService = Executors.newSingleThreadExecutor();
         }
 
-        //get username
-        //contact api
         execService.submit(new Runnable() {
             @Override
             public void run() {
@@ -144,11 +122,6 @@ public class NotificationsService extends LifecycleService {
                         .build();
 
                 notificationManager.notify(Constants.NOTIFICATION_ID, notification);
-
-                //The recursive bit - if started still true, call self again
-//                if(started) {
-//                    doActualWork();
-//                }
             }
         });
 

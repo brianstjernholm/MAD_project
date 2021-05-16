@@ -30,9 +30,8 @@ public class LoginViewModel extends ViewModel {
     public List<AuthUI.IdpConfig> buildExternalProviderList() {
         return Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
-                //new AuthUI.IdpConfig.FacebookBuilder().build(),
                 new AuthUI.IdpConfig.TwitterBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build()
+                new AuthUI.IdpConfig.GoogleBuilder().build() //Currently not working
         );
     }
 

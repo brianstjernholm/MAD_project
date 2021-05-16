@@ -16,4 +16,5 @@
     <string name="notificationservice">Notifikation service for besked appen</string>
     <string name="thisisnotification">Dette er besked appen med notifikation service</string>
     <string name="startingNotificationService">Foreground service kører</string>
+    <string name="nojoke">Sorry. No joke could be found.</string>
 </resources>

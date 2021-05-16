@@ -24,6 +24,7 @@ import dk.au.mad21spring.appproject.gruppe2.models.Chat;
 import dk.au.mad21spring.appproject.gruppe2.models.User;
 import dk.au.mad21spring.appproject.gruppe2.utils.Constants;
 import dk.au.mad21spring.appproject.gruppe2.viewmodels.ChatFragmentViewModel;
+//This code is an adaptation of this tutorial https://www.youtube.com/watch?v=LyAmpfm4ndo&list=PLzLFqCABnRQftQQETzoVMuteXzNiXmnj8&index=3
 
 public class MessageAdapter extends
         RecyclerView.Adapter<MessageAdapter.ViewHolder> {
